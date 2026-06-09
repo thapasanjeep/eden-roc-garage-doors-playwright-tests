@@ -1,0 +1,21 @@
+# Virtual environment
+.venv/
+venv/
+
+# Pytest cache
+.pytest_cache/
+__pycache__/
+*.pyc
+
+# Playwright browsers
+playwright/.local-browsers/
+
+# Test reports
+report.html
+
+# PyCharm
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

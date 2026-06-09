@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                // Jenkins pulls your code from Git
+                checkout scm
+            }
+        }
+
+        stage('Setup Python') {
+            steps {
+                // Create virtual environment and install dependencies
+                bat 'python -m venv venv'
+                bat 'venv\\Scripts\\pip install -r requirements.txt'
+            }
+        }
+
+        stage('Install Playwright Browsers') {
+            steps {
+                // This is the KEY difference from Selenium
+                // Playwright needs its own browser binaries installed
+                bat 'venv\\Scripts\\playwright install chromium'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                // Run headless — no --headed flag in CI
+                bat 'venv\\Scripts\\pytest tests/ -v --html=report.html'
+            }
+        }
+    }
+
+    post {
+        always {
+            // Publish the HTML report in Jenkins
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: '.',
+                reportFiles: 'report.html',
+                reportName: 'Playwright Test Report'
+            ])
+        }
+        success {
+            echo 'All tests passed!'
+        }
+        failure {
+            echo 'Some tests failed — check the report'
+        }
+    }
+}
