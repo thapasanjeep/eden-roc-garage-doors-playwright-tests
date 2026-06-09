@@ -12,7 +12,7 @@ pipeline {
         stage('Setup Python Environment') {
             steps {
                 // Create virtual environment
-                bat 'python -m venv venv'
+                bat 'C:\Users\Lenovo\AppData\Local\Programs\Python\Python314\python.exe -m venv venv'
                 // Install all dependencies from requirements.txt
                 bat 'venv\\Scripts\\pip install -r requirements.txt'
             }
