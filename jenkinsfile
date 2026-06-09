@@ -5,30 +5,30 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                // Jenkins pulls your code from Git
                 checkout scm
             }
         }
 
-        stage('Setup Python') {
+        stage('Setup Python Environment') {
             steps {
-                // Create virtual environment and install dependencies
+                // Create virtual environment
                 bat 'python -m venv venv'
+                // Install all dependencies from requirements.txt
                 bat 'venv\\Scripts\\pip install -r requirements.txt'
             }
         }
 
         stage('Install Playwright Browsers') {
             steps {
-                // This is the KEY difference from Selenium
-                // Playwright needs its own browser binaries installed
+                // KEY difference from Selenium
+                // Playwright needs its own Chromium binary
                 bat 'venv\\Scripts\\playwright install chromium'
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Playwright Tests') {
             steps {
-                // Run headless — no --headed flag in CI
+                // Run headless — no --headed in CI
                 bat 'venv\\Scripts\\pytest tests/ -v --html=report.html'
             }
         }
@@ -36,7 +36,7 @@ pipeline {
 
     post {
         always {
-            // Publish the HTML report in Jenkins
+            // Always publish report whether tests pass or fail
             publishHTML([
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
@@ -47,10 +47,10 @@ pipeline {
             ])
         }
         success {
-            echo 'All tests passed!'
+            echo '✅ All Playwright tests passed!'
         }
         failure {
-            echo 'Some tests failed — check the report'
+            echo '❌ Some tests failed — check the report'
         }
     }
 }
